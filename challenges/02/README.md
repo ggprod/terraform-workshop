@@ -12,6 +12,6 @@ This challenge involves using some modules from the Terraform registry to build 
 
 [The RDS module](https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/2.5.0?tab=resources)
 
-The security groups and route tables aren't shown but should be chosen sensibly (e.g. alb listening on 80 from internet, app servers on 8080 from ALB, DB on 3306 from app servers, app servers able to make requests to internet via NAT gateways)
+The security groups and route tables aren't shown but should be chosen sensibly (e.g. alb listening on 80 from internet, app servers on 8080 from ALB, DB on 3306 from app servers (use MySQL RDS), app servers able to make requests to internet via NAT gateways)
 
 <img src="./alb-autoscaling.png" width="800" height="600" />
