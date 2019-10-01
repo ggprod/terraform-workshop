@@ -8,4 +8,4 @@ This challenge involves using some modules from the Terraform registry (along wi
 
 You'll still need to create the EC2 instances direct from provider resources.
 
-![](./bastion.png=300x300)
+![](./bastion.png =300x300)
