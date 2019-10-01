@@ -7,3 +7,5 @@ This challenge involves using some modules from the Terraform registry (along wi
 [The Security Group module](https://registry.terraform.io/modules/terraform-aws-modules/security-group/aws/3.1.0)
 
 You'll still need to create the EC2 instances direct from provider resources.
+
+![](./bastion.png=300x300)
