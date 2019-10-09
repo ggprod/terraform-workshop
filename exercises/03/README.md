@@ -187,7 +187,7 @@ Find `main.tf` and modify the s3 bucket stanza to reflect the following:
 ```hcl
 # declare a resource stanza so we can create something.
 resource "aws_s3_bucket_object" "user_student_alias_object" {
-  bucket  = "terraform-${var.student_alias}"
+  bucket  = ""${aws_s3_bucket.user_student_bucket.bucket}"
   key     = "student.alias"
   content = "This bucket is reserved for ${var.student_alias} ****ONLY****"
 }
