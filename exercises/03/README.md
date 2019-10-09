@@ -43,6 +43,28 @@ Resource actions are indicated with the following symbols:
 
 Terraform will perform the following actions:
 
+  # aws_s3_bucket.user_student_bucket will be created
+  + resource "aws_s3_bucket" "user_student_bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = "private"
+      + arn                         = (known after apply)
+      + bucket                      = "terraform-chucky"
+      + bucket_domain_name          = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + versioning {
+          + enabled    = (known after apply)
+          + mfa_delete = (known after apply)
+        }
+    }
+
   # aws_s3_bucket_object.user_student_alias_object will be created
   + resource "aws_s3_bucket_object" "user_student_alias_object" {
       + acl                    = "private"
@@ -50,6 +72,7 @@ Terraform will perform the following actions:
       + content                = "This bucket is reserved for chucky"
       + content_type           = (known after apply)
       + etag                   = (known after apply)
+      + force_destroy          = false
       + id                     = (known after apply)
       + key                    = "student.alias"
       + server_side_encryption = (known after apply)
@@ -57,7 +80,7 @@ Terraform will perform the following actions:
       + version_id             = (known after apply)
     }
 
-Plan: 1 to add, 0 to change, 0 to destroy.
+Plan: 2 to add, 0 to change, 0 to destroy.
 
 ------------------------------------------------------------------------
 
@@ -90,6 +113,28 @@ Resource actions are indicated with the following symbols:
 
 Terraform will perform the following actions:
 
+  # aws_s3_bucket.user_student_bucket will be created
+  + resource "aws_s3_bucket" "user_student_bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = "private"
+      + arn                         = (known after apply)
+      + bucket                      = "terraform-chucky"
+      + bucket_domain_name          = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + versioning {
+          + enabled    = (known after apply)
+          + mfa_delete = (known after apply)
+        }
+    }
+
   # aws_s3_bucket_object.user_student_alias_object will be created
   + resource "aws_s3_bucket_object" "user_student_alias_object" {
       + acl                    = "private"
@@ -97,6 +142,7 @@ Terraform will perform the following actions:
       + content                = "This bucket is reserved for chucky"
       + content_type           = (known after apply)
       + etag                   = (known after apply)
+      + force_destroy          = false
       + id                     = (known after apply)
       + key                    = "student.alias"
       + server_side_encryption = (known after apply)
@@ -104,7 +150,7 @@ Terraform will perform the following actions:
       + version_id             = (known after apply)
     }
 
-Plan: 1 to add, 0 to change, 0 to destroy.
+Plan: 2 to add, 0 to change, 0 to destroy.
 
 Do you want to perform these actions?
   Terraform will perform the actions described above.
@@ -112,10 +158,12 @@ Do you want to perform these actions?
 
   Enter a value: yes
 
+aws_s3_bucket.user_student_bucket: Creating...
+aws_s3_bucket.user_student_bucket: Creation complete after 1s [id=terraform-chucky]
 aws_s3_bucket_object.user_student_alias_object: Creating...
-aws_s3_bucket_object.user_student_alias_object: Creation complete after 1s [id=student.alias]
+aws_s3_bucket_object.user_student_alias_object: Creation complete after 0s [id=student.alias]
 
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 ```
 
 Now lets run a plan again.
@@ -160,11 +208,13 @@ Terraform will perform the following actions:
   ~ resource "aws_s3_bucket_object" "user_student_alias_object" {
         acl           = "private"
         bucket        = "terraform-chucky"
-      ~ content       = "This bucket is reserved for chucky" -> "This bucket is reserved for chucky ****ONLY****"
+      ~ content       = "This bucket is reserved for chucky" -> "This bucket is reserved for chucky  ****ONLY****"
         content_type  = "binary/octet-stream"
-        etag          = "94e32327b8007fa215f3a9edbda7f68c"
+        etag          = "cd847d7a967a03f5a013ceefebbd7ae4"
+        force_destroy = false
         id            = "student.alias"
         key           = "student.alias"
+        metadata      = {}
         storage_class = "STANDARD"
         tags          = {}
     }
@@ -201,6 +251,7 @@ terraform destroy
 You should get the following:
 
 ```
+aws_s3_bucket.user_student_bucket: Refreshing state... [id=terraform-chucky]
 aws_s3_bucket_object.user_student_alias_object: Refreshing state... [id=student.alias]
 
 An execution plan has been generated and is shown below.
@@ -209,31 +260,42 @@ Resource actions are indicated with the following symbols:
 
 Terraform will perform the following actions:
 
+  # aws_s3_bucket.user_student_bucket will be destroyed
+  - resource "aws_s3_bucket" "user_student_bucket" {
+      - acl                         = "private" -> null
+      - arn                         = "arn:aws:s3:::terraform-chucky" -> null
+      - bucket                      = "terraform-chucky" -> null
+      - bucket_domain_name          = "terraform-chucky.s3.amazonaws.com" -> null
+      - bucket_regional_domain_name = "terraform-chucky.s3.amazonaws.com" -> null
+      - force_destroy               = false -> null
+      - hosted_zone_id              = "Z3AQBSTGFYJSTF" -> null
+      - id                          = "terraform-chucky" -> null
+      - region                      = "us-east-1" -> null
+      - request_payer               = "BucketOwner" -> null
+      - tags                        = {} -> null
+
+      - versioning {
+          - enabled    = false -> null
+          - mfa_delete = false -> null
+        }
+    }
+
   # aws_s3_bucket_object.user_student_alias_object will be destroyed
   - resource "aws_s3_bucket_object" "user_student_alias_object" {
       - acl           = "private" -> null
       - bucket        = "terraform-chucky" -> null
-      - content       = "This bucket is reserved for chucky ****ONLY****" -> null
+      - content       = "This bucket is reserved for chucky" -> null
       - content_type  = "binary/octet-stream" -> null
-      - etag          = "c7e49348083281f9dd997923fe6084b7" -> null
+      - etag          = "cd847d7a967a03f5a013ceefebbd7ae4" -> null
+      - force_destroy = false -> null
       - id            = "student.alias" -> null
       - key           = "student.alias" -> null
+      - metadata      = {} -> null
       - storage_class = "STANDARD" -> null
       - tags          = {} -> null
     }
 
-Plan: 0 to add, 0 to change, 1 to destroy.
-
-Do you really want to destroy all resources?
-  Terraform will destroy all your managed infrastructure, as shown above.
-  There is no undo. Only 'yes' will be accepted to confirm.
-
-  Enter a value: yes
-
-aws_s3_bucket_object.user_student_alias_object: Destroying... [id=student.alias]
-aws_s3_bucket_object.user_student_alias_object: Destruction complete after 0s
-
-Destroy complete! Resources: 1 destroyed.
+Plan: 0 to add, 0 to change, 2 to destroy.
 ```
 
 You'll notice that the destroy process if very similar to apply, just the other way around! And it also requires
