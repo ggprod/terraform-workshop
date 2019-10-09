@@ -10,7 +10,7 @@ provider "aws" {
 # declare some resource stanzas so we can create something.
 
 resource "aws_s3_bucket" "user_student_bucket" {
-  bucket  = "rockholla-di-${var.student_alias}"
+  bucket  = "terraform-${var.student_alias}"
 }
 resource "aws_s3_bucket_object" "user_student_alias_object" {
   bucket  = "${aws_s3_bucket.user_student_bucket.bucket}"

@@ -30,7 +30,7 @@ terraform init
 terraform apply
 terraform show
 ```
-The above should show that you have a bucket now named `rockholla-di-[your student alias]-alt` that was created in the
+The above should show that you have a bucket now named `terraform-[your student alias]-alt` that was created in the
 us-west-2 region.
 
 *NOTE:* that at the beginning of our course we set the `AWS_DEFAULT_REGION` environment variable in your Cloud9 environment.

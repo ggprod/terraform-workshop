@@ -6,7 +6,7 @@ a Cloud9 server/environment set up where you'll run further exercises.
 ## Log into the AWS Console and Create an Access Key for yourself
 
 1. Log in to AWS using the link, username, and password provided to you
-1. In the top bar, near the right, you'll see your username/alias @ rockholla-di. Click on it which will show a dropdown
+1. In the top bar, near the right, you'll see your username/alias @ 7326-4752-6830 (the AWS account ID). Click on it which will show a dropdown
 1. In the dropdown, click on "My Security Credentials"
 1. This will take you to your security credentials screen/tab. Feel free to change your password if you like, you'll be using this account for the next 2 days.
 1. Click "Create access key"
@@ -16,7 +16,7 @@ a Cloud9 server/environment set up where you'll run further exercises.
 ## Launch your Environment
 
 1. In the top bar of the AWS Console, near the left, you'll see "AWS Services", click on it, and in the drop down search box, type "Cloud9" which will filter available services in the search list. Click on "Cloud9" which will take you to where we can create your environment.
-1. **IMPORTANT**: Select **US East (Ohio)** in the upper right corner of your AWS console as the region
+1. **IMPORTANT**: Select the region assigned to you in the upper right corner of your AWS console as the region
 1. Click on "Create Environment"
 1. Give your environment a unique name (your student alias is suggested) and, optionally, a description. Click "Next"
 1. Keep the settings as their defaults on this screen, then click "Next"
@@ -32,7 +32,6 @@ a Cloud9 server/environment set up where you'll run further exercises.
 1. This is a fully functioning bash terminal running inside an EC2 instance, but it is the base AWS Linux OS and doesn't have the things we need to execute this workshop, so lets install a few packages.
 
 ```bash
-sudo yum -y install jq git
 sudo pip install --upgrade pip
 sudo ln -s /usr/local/bin/pip /bin
 sudo pip install --upgrade awscli
@@ -43,8 +42,8 @@ sudo pip install --upgrade awscli
 Run these commands in your cloud9 IDE terminal window to install Terraform
 
 ```bash
-curl -O https://releases.hashicorp.com/terraform/0.12.9/terraform_0.12.9_linux_amd64.zip
-sudo unzip terraform_0.12.9_linux_amd64.zip -d /usr/bin/
+curl -O https://releases.hashicorp.com/terraform/0.12.10/terraform_0.12.10_linux_amd64.zip
+sudo unzip terraform_0.12.10_linux_amd64.zip -d /usr/bin/
 ```
 
 Then test to ensure it was installed properly.
@@ -68,11 +67,13 @@ git clone https://github.com/ggprod/terraform-workshop .
 
 ## Set up your environment credentials to connect to AWS
 
-place the following in your `$HOME/.bash_profile` file at the bottom, and replace the values in brackets with your generated creds:
+First you should disable the Cloud9 managed temporary credentials by clicking on **AWS Cloud9** (in the menu bar), selecting **Preferences** in the dropdown, then clicking on **AWS Settings** in the **Preferences** tab, and the clicking on the switch for **AWS managed temporary credentials** to turn it off.
+
+Place the following in your `$HOME/.bash_profile` file at the bottom, and replace the values in brackets with your generated creds and assigned region:
 ```
 export AWS_ACCESS_KEY_ID=[The access key ID you created above]
 export AWS_SECRET_ACCESS_KEY=[The secret access key you created above]
-export AWS_DEFAULT_REGION=us-east-2
+export AWS_DEFAULT_REGION=[your assigned region]
 ```
 
 Then source your new .bash_profile and ensure environment has the appropriate env vars set:

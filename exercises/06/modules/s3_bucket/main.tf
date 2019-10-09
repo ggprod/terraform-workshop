@@ -12,5 +12,5 @@ provider "aws" {
 resource "aws_s3_bucket" "user_bucket_random" {
   # bucket_prefix is a nice option in the aws provider for creating s3 buckets
   # the suffix will be a semi-random sequence
-  bucket_prefix = "rockholla-di-${var.student_alias}-"
+  bucket_prefix = "terraform-${var.student_alias}-"
 }
