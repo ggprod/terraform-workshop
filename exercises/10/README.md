@@ -259,7 +259,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-Then run `terraform apply` again and go to the Dynamo DB section and look under Tables and Items and see the Lock entry has been added.  This will prevent anyone else that is working with the same backend from acquiring a lock (prevent them from starting a terraform apply until the lock is freed).  When the `terraform apply` completes refresh the page and notice how the lock item changes.  Try running 'terraform apply' again to see how a new entry added.
+Then run `terraform apply` again and go to the Dynamo DB section and look under Tables and Items and see the Lock entry has been added.  This will prevent anyone else that is working with the same backend from acquiring a lock (prevent them from starting a `terraform apply` until the lock is freed).  When the `terraform apply` completes refresh the page and notice how the lock item changes.  Try running `terraform apply` again to see how a new entry added.
 
 ### Finishing up this exercise
 
