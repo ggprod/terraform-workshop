@@ -4,3 +4,7 @@
 variable "student_alias" {
   description = "Your student alias"
 }
+
+variable "region" {
+  description = "Your region"
+}

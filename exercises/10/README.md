@@ -56,9 +56,8 @@ Terraform will perform the following actions:
       + acceleration_status         = (known after apply)
       + acl                         = "private"
       + arn                         = (known after apply)
-      + bucket                      = (known after apply)
+      + bucket                      = "terraform-state-bucket-bane"
       + bucket_domain_name          = (known after apply)
-      + bucket_prefix               = "terraform-bane-"
       + bucket_regional_domain_name = (known after apply)
       + force_destroy               = true
       + hosted_zone_id              = (known after apply)
@@ -83,13 +82,13 @@ Do you want to perform these actions?
   Enter a value: yes
 
 aws_s3_bucket.state_bucket: Creating...
-aws_s3_bucket.state_bucket: Creation complete after 5s [id=terraform-bane-20190623022126911700000001]
+aws_s3_bucket.state_bucket: Still creating... [10s elapsed] [id=terraform-state-bucket-bane]
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-state_bucket_name = terraform-bane-20190623022126911700000001
+state_bucket_name = terraform-state-bucket-bane
 ```
 
 Now, before we move on, you may be asking yourself: so what about the state for this state bucket? And it's a good 
@@ -111,7 +110,7 @@ cd ..
 terraform init -backend-config=backend.tfvars
 ```
 
-The above will prompt you for the backend bucket name to use
+The above will prompt you for the backend bucket name to use.  Notice that it doesn't ask for the key name to use because we are providing that in the `backend.tfvars` file.  If we just did `terraform init` (without the `-backend-config=backend.tfvars`) it would ask us for a key as well (since then the key wouldn't be provided by the `backend.tfvars` file).  We could also provide the bucket and key in the `backend.tfvars` file and then it wouldn't ask for either (if we used the `terraform init -backend-config=backend.tfvars` command)
 
 ```
 Initializing the backend...
@@ -129,7 +128,7 @@ however, still parameterize this stuff. This is particularly useful for things l
 you might pass into backend configuration. You can store it temporarily outside of your infrastructure code and
 simply instruct Terraform to use these values.
 
-Now let's move on to our plan and apply
+Now let's move on to our apply
 
 ```bash
 terraform plan -out=plan.out
@@ -150,10 +149,12 @@ terraform apply plan.out
 And you should get something similar to below
 
 ```
+aws_s3_bucket.user_student_bucket: Creating...
+aws_s3_bucket.user_student_bucket: Creation complete after 1s [id=terraform-bane]
 aws_s3_bucket_object.user_student_alias_object: Creating...
-aws_s3_bucket_object.user_student_alias_object: Creation complete after 1s [id=student.alias]
+aws_s3_bucket_object.user_student_alias_object: Creation complete after 3s [id=student.alias]
 
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 
 ```
 
@@ -177,7 +178,7 @@ address safe and maintainable collaboration on infrastructure using terraform. A
 * April is testing some changes to the terraform source to remove a DB instance that is no longer needed against the staging infrastructure
 * At the same time, Matt is running the current version of the terraform code against staging to test some other things out, but his changes still have the DB that April is removing. April's removal might go through, but then the DB is immediately recreated by Matt's run. So, April might be scratching her head in 10 minutes wondering how that DB is suddenly there again
 
-Locking the state file can address situations like the above and many other problematic scenarios in team collaboration using Terraform. We won't go into the details of state locking as an exercise. The thing that's important to know for the sake of this course around remote state locking:
+Locking the state file can address situations like the above and many other problematic scenarios in team collaboration using Terraform.
 
 * The S3 backend has built-in support for state locking
 * It supports this locking through a Dynamo DB table
@@ -187,14 +188,78 @@ The above can simply be accomplished via the backend config like the following:
 ```hcl
 terraform {
   backend "s3" {
-    encrypt         = true
     bucket          = "REPLACE-WITH-YOUR-STATE-BUCKET-NAME"
     dynamodb_table  = "terraform-state-lock-dynamo"
-    region          = us-east-2
     key             = "exercise-10/terraform.tfstate"
   }
 }
 ```
+
+### Working with remote state locking in S3 backends
+
+Let's update our state-bucket module to create a Dynamo DB table and then update our backend config to use this DynamoDB table for locking.
+
+First let's update the `state-bucket/main.tf` file to build the Dynamo DB table by adding a new resource stanza (and an output to display the result)
+
+```hcl
+resource "aws_dynamodb_table" "state_lock_table" {
+  name = "terraform-state-lock-${var.student_alias}"
+  hash_key = "LockID"
+  write_capacity = 10
+  read_capacity = 10
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+output "state_lock_table" {
+  value = "${aws_dynamodb_table.state_lock_table.name}"
+}
+```
+
+Note: The Dynamo DB table requires a primary key named **LockID** which can be defined as in the resource stanza above.
+
+Now let's rerun `terraform apply` in the state-bucket folder to create the Dynamo DB table
+
+```bash
+cd state-bucket
+terraform apply
+```
+
+Make note of the new output that shows the new Dynamo DB table name (`state_lock_table`). It should start with `terraform-state-lock-`. Then we can update the backend configuration in the `main.tf` of the parent folder to use this table for locking.  Replace REPLACE-WITH-YOUR-STATE-LOCK-TABLE-NAME with the Dynamo DB table name you noted (don't forget the quotation marks around it as this is a string).
+
+```hcl
+terraform {
+  backend "s3" {
+    dynamodb_table = REPLACE-WITH-YOUR-STATE-LOCK-TABLE-NAME
+  }
+}
+```
+
+Then let's move back to the parent folder and rerun terraform init -backend-config=backend.tfvars
+
+```bash
+cd ..
+terraform init -backend-config=backend.tfvars
+```
+
+Let's test the lock by making a change to the parent folder `main.tf` file, running `terraform apply`, and then checking the table to see the lock entry added until the operation completes.
+
+Add this resource stanza to the `main.tf` file of the parent folder
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0b69ea66ff7391e80"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "lock-test-${var.student_alias}"
+  }
+}
+```
+
+Then run `terraform apply` again and go to the Dynamo DB section and look under Tables and Items and see the Lock entry has been added.  This will prevent anyone else that is working with the same backend from acquiring a lock (prevent them from starting a terraform apply until the lock is freed).  When the `terraform apply` completes refresh the page and notice how the lock item changes.  Try running 'terraform apply' again to see how a new entry added.
 
 ### Finishing up this exercise
 
